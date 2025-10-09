@@ -120,5 +120,4 @@ fi
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 # asdf install via brew configuration
-. /home/linuxbrew/.linuxbrew/opt/asdf/libexec/asdf.sh
-
+. $(brew --prefix asdf)/libexec/asdf.sh
