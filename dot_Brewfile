@@ -1,5 +1,5 @@
-# Extendable version manager with support for Ruby, Node.js, Erlang & more
-brew "asdf"
+# Secure and free password manager for all of your devices
+brew "bitwarden-cli"
 # Manage your dotfiles across multiple diverse machines, securely
 brew "chezmoi"
 # GNU compiler collection
