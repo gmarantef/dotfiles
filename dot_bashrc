@@ -116,8 +116,10 @@ if ! shopt -oq posix; then
   fi
 fi
 
-
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# Homebrew (managed by chezmoi)
+if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+  eval "$('/home/linuxbrew/.linuxbrew/bin/brew' shellenv)"
+fi
 
 # asdf install via brew configuration
 . $(brew --prefix asdf)/libexec/asdf.sh
