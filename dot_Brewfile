@@ -10,3 +10,12 @@ brew "zsh"
 brew "zsh-autosuggestions"
 # Fish shell like syntax highlighting for zsh
 brew "zsh-syntax-highlighting"
+
+# GUI for bitwarden via flatpak
+flatpak "com.bitwarden.desktop"
+# GUI for VSCode IDE via flatpak
+flatpak "com.visualstudio.code"
+# GUI for Obsidian via flatpak
+flatpak "md.obsidian.Obsidian"
+# GUI for Steam via flatpak
+flatpak "com.valvesoftware.Steam"
