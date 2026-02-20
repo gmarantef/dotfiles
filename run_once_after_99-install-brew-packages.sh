@@ -51,6 +51,13 @@ fi
 if command -v zsh >/dev/null 2>&1; then
     ZSH_PATH="$(command -v zsh)"
 
+    # Install Oh-My-ZSH if not exists
+    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+        echo "Installing Oh My Zsh..."
+        RUNZSH=no CHSH=no sh -c \
+            "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    fi
+
     # Only ask if it's not already the default shell
     if [ "$SHELL" != "$ZSH_PATH" ]; then
         if [ -t 0 ]; then
