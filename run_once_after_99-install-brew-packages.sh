@@ -54,7 +54,7 @@ if command -v zsh >/dev/null 2>&1; then
     # Install Oh-My-ZSH if not exists
     if [ ! -d "$HOME/.oh-my-zsh" ]; then
         echo "Installing Oh My Zsh..."
-        RUNZSH=no CHSH=no sh -c \
+        RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c \
             "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     fi
 
