@@ -70,7 +70,24 @@ ZSH_THEME="gnzh"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(
+    git
+
+    docker
+    docker-compose
+
+    sudo
+    extract
+    z
+    history
+    command-not-found
+
+    vscode
+
+    # Community Plugins (must be last)
+    zsh-autosuggestions
+    zsh-syntax-highlighting
+)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -103,9 +120,7 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# Initialize Homebrew
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-
-# Load third-party plugins installed via Homebrew
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# Config brew for zsh terminal
+if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+  eval "$('/home/linuxbrew/.linuxbrew/bin/brew' shellenv)"
+fi
