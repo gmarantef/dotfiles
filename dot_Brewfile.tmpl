@@ -1,0 +1,18 @@
+# GNU compiler collection
+brew "gcc"
+
+{{ if (and (ne .data.context "minimal") (eq .data.feature "gui"))}}
+{{ if eq .chezmoi.os "linux"}}
+flatpak "com.visualstudio.code"
+flatpak "md.obsidian.Obsidian"
+{{else}}
+cask "visual-studio-code"
+cask "obsidian"
+{{end}}
+
+{{ if (and (eq .data.context "personal") (eq .data.feature "gui"))}}
+{{ if eq .chezmoi.os "linux"}}
+flatpak "com.valvesoftware.Steam"
+{{else}}
+cask "steam"
+{{end}}

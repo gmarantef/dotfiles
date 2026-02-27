@@ -1,0 +1,63 @@
+#!/bin/sh
+set -e
+
+OS="{{ .chezmoi.os }}"
+ARCHITECTURE="$(uname -m)"
+FEATURES="{{ join " " .features }}"
+CONTEXT="{{ .context }}"
+DEFAULT_SHELL="{{ .default_shell }}"
+CLOUD_PROVIDERS="{{ join " " .cloud_providers }}"
+
+export OS
+export ARCHITECTURE
+export FEATURES
+export CONTEXT
+export DEFAULT_SHELL
+export CLOUD_PROVIDERS
+
+echo "Detected OS: $OS"
+echo "Enabled features: $FEATURES"
+echo "Conext for templating: $CONTEXT"
+echo "Cloud providers: $CLOUD_PROVIDERS"
+
+# OS specific setup (minimal example)
+case "$OS" in
+  linux)
+    echo "Running Linux base setup"
+    sh bootstrap/os/linux.sh
+    ;;
+  darwin)
+    echo "Running macOS base setup"
+    sh bootstrap/os/darwin.sh
+    ;;
+  *)
+    echo "Unsupported OS: $OS"
+    ;;
+esac
+
+# Execute selected features
+for feature in $FEATURES; do
+  case "$feature" in
+    brew)
+      echo "Running brew feature setup"
+      sh bootstrap/features/brew.sh
+      ;;
+    bundle)
+      echo "Running bundle feature setup"
+      sh bootstrap/features/bundle.sh
+      ;;
+    shell)
+      echo "Running shell feature setup"
+      sh bootstrap/features/shell.sh
+      ;;
+    gui)
+      echo "Running gui feature setup"
+      sh bootstrap/features/gui.sh
+      ;;
+    *)
+      echo "Unknown feature: $feature"
+      ;;
+  esac
+done
+
+echo "Bootstrap completed."

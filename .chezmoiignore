@@ -1,0 +1,14 @@
+README.md
+
+{{ if not (has .data.features "gui") }}
+{{ if ne .chezmoi.os "darwin" }}
+Library/Application Support/Code/User/settings.json.tmpl
+{{ end }}
+{{ if ne .chezmoi.os "linux" }}
+.config/Code/User/settings.json.tmpl
+{{ end }}
+{{end}}
+
+{{- if not has "aws" .data.cloud_providers }}
+.aws # only manage .aws on feature with aws cloud provider
+{{- end }}

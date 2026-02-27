@@ -1,0 +1,400 @@
+# Bootstrap de Sistema Multi-OS con chezmoi
+
+Repositorio personal para el bootstrap reproducible de sistemas Linux y macOS
+usando chezmoi como motor de orquestación.
+
+Este proyecto convierte un sistema limpio en un entorno completamente
+configurado mediante la gestión declarativa de dotfiles, ejecución controlada
+de scripts de bootstrap y consumo seguro de secretos desde un gestor externo.
+
+> Objetivo: reproducibilidad, portabilidad y separación clara entre OS,
+features y contexto.
+
+---
+
+## ¿Qué es este proyecto?
+
+Este repositorio implementa una arquitectura de bootstrap basada en:
+
+- Gestión declarativa de dotfiles
+- Instalación modular de características del sistema (features)
+- Separación por sistema operativo
+- Adaptación por contexto (work / personal)
+- Integración con gestor de contraseñas sin almacenar secretos
+
+No pretende ser un framework genérico, sino una base sólida, extensible y
+profesional para la gestión de mis entornos de trabajo.
+
+Puede ser reutilizado por terceros con conocimientos previos en:
+- Git
+- Terminal
+- chezmoi
+- Gestión básica de sistemas Linux/macOS
+
+---
+
+# Índice
+
+- [Arquitectura](#arquitectura)
+  - [Tools utilizadas](#tools-utilizadas)
+  - [Dimensiones](#dimensiones)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Requisitos](#requisitos)
+- [Gestión de secretos](#gestión-de-secretos)
+- [Uso inicial](#uso-inicial)
+- [Uso diario](#uso-diario)
+- [Testing](#testing)
+- [Roadmap](#roadmap)
+- [Filosofía del proyecto](#filosofía-del-proyecto)
+
+# Arquitectura
+
+El eje central del proyecto es:
+
+- [chezmoi](https://www.chezmoi.io/)
+
+Sobre este se construye una arquitectura basada en **3 dimensiones**:
+
+1. OS
+2. Features
+3. Context
+
+Esta separación permite composición, idempotencia y superposición de
+configuraciones.
+
+---
+
+## Tools utilizadas
+
+El entorno se apoya en:
+
+- Homebrew + Flatpak → gestión de paquetes
+- zsh + oh-my-zsh → configuración de shell
+- docker (+ Colima en macOS) → contenedores
+- Bitwarden → gestión de secretos
+
+---
+
+## Dimensiones
+
+### OS
+
+Detectado automáticamente por chezmoi.
+
+Responsabilidades:
+- Garantizar entorno mínimo del host
+- Preparar prerequisitos para features
+- Diferenciar comportamiento Linux / macOS
+
+En Linux, las distros guían los procesos concretos de instalación.
+
+---
+
+### Features
+
+Las features representan dominios funcionales instalables de forma modular e
+idempotente.
+
+Se ejecutan desde:
+
+```bash
+run_once_bootstrap.sh.tmpl
+```
+
+Features disponibles:
+
+- `ai` → entorno asistido por IA
+- `brew` → instalación y configuración de Homebrew
+- `bundle` → instalación desde Brewfile
+- `cloud` → CLI de proveedores cloud
+- `containers` → entorno Docker
+- `gui` → aplicaciones GUI
+- `security` → gestor de contraseñas
+- `shell` → configuración de shell
+
+Cada feature está diseñada para:
+- Ser independiente
+- Ser combinable
+- Poder ejecutarse en cualquier orden lógico definido en data
+
+> Nota: ciertas features como por ejemplo bundle que requiere de Homebrew
+instalado y por tanto puede aparentar que existe dependencia frente a la
+feature brew se tratan con independencia en gestión de instalación.
+
+---
+
+### Context
+
+Permite variar tanto dotfiles como templates scripts según perfil:
+
+- `work`
+- `personal`
+
+El contexto afecta especialmente a:
+- Configuración
+- Secretos
+- Perfiles cloud
+- Ajustes específicos de entorno
+
+---
+
+# Estructura del proyecto
+
+```
+chezmoi/
+├── .chezmoitemplates
+│   ├── ...
+├── bootstrap/
+│   ├── features
+│   |   ├── ...
+│   └── os
+│       ├── ...
+├── dot_folders
+│   ├── ...
+├── private_dot_folders
+│   ├── ...
+├── .chezmoi.toml.tmpl
+├── .chezmoiignore
+├── .gitignore
+├── chezmoidata.yaml
+├── dot_files
+├── private_dot_files
+├── README.md
+└── run_once_bootstrap.sh.tmpl
+```
+
+---
+
+# Requisitos
+
+- Git
+- curl
+- Acceso a internet
+- Conocimientos básicos de terminal
+- Cuenta en Bitwarden o gestor de contraseñas alternativo
+
+---
+
+# Gestión de secretos
+
+Este repositorio **no almacena secretos**.
+
+La estrategia es:
+
+- Uso de Bitwarden como vault externo
+- Extracción de credenciales en caliente
+- No persistencia en disco
+
+Ejemplo destacado:
+
+```private_dot_local/bin/aws-bw-helper.sh```
+
+
+Este script permite autenticación temporal en AWS usando el Process Credential
+Provider del SDK, evitando almacenar claves localmente.
+
+El uso de `private_` en chezmoi solo limita visibilidad en el sistema destino.
+No implica almacenamiento de secretos en el repositorio.
+
+---
+
+# Uso inicial
+
+## 1. Instalar chezmoi
+
+```bash
+sh -c "$(curl -fsLS get.chezmoi.io)"
+```
+
+## 2. Crear tu propio fork del repositorio
+
+Se recomienda clonar este proyecto y generar un repositorio propio
+para personalización y versionado.
+
+## 3. Inicializar en un sistema limpio
+
+```bash
+chezmoi init https://github.com/<tu_usuario>/dotfiles.git
+```
+
+## 4. Personalizar configuración
+
+Modificar principalmente:
+
+- ```chezmoidata.yaml```
+
+- ```.chezmoi.toml.tmpl```
+
+- dotfiles y dot folders
+
+Puede hacerse:
+
+- Desde ```~/.local/share/chezmoi```
+
+- O usando ```chezmoi edit```
+
+## 5. Aplicar configuración
+
+### Apply con configuración por defecto
+
+```bash
+chezmoi apply
+```
+
+### Apply sin ejecutar scripts
+
+```bash
+chezmoi apply --exclude=scripts
+```
+
+### Apply sobrescribiendo variables
+
+```bash
+chezmoi apply \
+  --data '{
+    "features": ["brew","shell","containers","cloud"],
+    "context": "work",
+    "cloud_providers": ["aws"]
+  }'
+```
+
+---
+
+### Flujo interno de ejecución
+
+1. Carga ```chezmoidata.yaml```
+2. Sobrescribe con ```--data``` si se especifica
+3. Genera ```chezmoi.toml``` desde ```.chezmoi.toml.tmpl```
+4. Renderiza y aplica dotfiles
+5. Ejecuta ```run_once_bootstrap.sh.tmpl```
+6. Ejecuta features en orden definido
+
+Para entorno mínimo:
+
+```bash
+chezmoi apply --data '{"features":[]}'
+```
+
+---
+
+# Uso diario
+
+Una vez inicializado:
+
+## Modificar ficheros
+
+### Opción recomendada por chezmoi
+
+```bash
+chezmoi edit <ruta_del_dotfile>
+```
+
+Permite:
+
+- Abrir con ```$EDITOR```
+- Mantener coherencia
+- Evitar desincronización
+
+Ver cambios antes de aplicar:
+
+```bash
+chezmoi diff
+```
+
+Aplicar cambios:
+
+```bash
+chezmoi apply <ruta_del_dotfile>
+```
+
+---
+
+### Modificación directa en source directory
+
+También se pueden editar directamente en:
+
+```code
+~/.local/share/chezmoi
+```
+
+Útil para:
+
+- Cambios grandes
+- Uso de IDE
+
+Después:
+
+```bash
+chezmoi diff
+chezmoi apply
+```
+
+---
+
+## Añadir nuevos ficheros
+
+```bash
+chezmoi add <fichero>
+```
+
+---
+
+## Auto commit y auto push
+
+Si en ```chezmoi.toml``` se configura:
+
+```toml
+[git]
+    autoCommit = true
+    autoPush = true
+```
+
+Entonces ```chezmoi edit``` realizará automáticamente:
+
+- add
+- commit
+- push
+
+Simplificando la sincronización con el repo.
+
+---
+
+# Testing
+
+Estado actual de validación:
+
+## Linux
+
+- [ ] Arch
+- [ ] Fedora
+- [ ] Ubuntu
+
+## macOS (Darwin)
+
+- [ ] brew
+- [ ] bundle
+- [ ] cloud
+- [ ] containers
+- [ ] gui
+- [ ] security
+- [ ] shell
+
+---
+
+# Roadmap
+
+- Implementar completamente ai.sh
+- Validar todas las features en Ubuntu
+- Arquitectura multi-profile para secretos
+- Evaluar soporte Windows
+
+---
+
+# Filosofía del proyecto
+
+- Idempotencia
+- Composición
+- Separación de responsabilidades
+- No almacenar secretos
+- Infraestructura personal reproducible
+- Claridad estructural por encima de complejidad oculta

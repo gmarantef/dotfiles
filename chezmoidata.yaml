@@ -1,0 +1,18 @@
+features:
+  - brew
+  - bundle
+  - containers
+  - gui
+  - shell
+  - security
+
+context: personal
+
+default_shell: zsh
+
+cloud_providers: []
+
+secrets:
+  aws:
+    personal: aws-credentials-personal
+    work: aws-credentials-work

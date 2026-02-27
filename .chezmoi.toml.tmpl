@@ -1,7 +1,18 @@
-{{- $email := promptStringOnce . "email" "Email address" -}}
+{{- /*
+   Safe defaults if values are missing
+*/ -}}
+
+{{- $features := .features | default (list) -}}
+{{- $context := .context | default "personal" -}}
+{{- $default_shell := .default_shell | default "zsh" -}}
+{{- $cloud_providers := .cloud_providers | default (list) -}}
 
 [data]
-	email = {{ $email | quote }}
+	features = {{ $features | toJson }}
+	context = "{{ $context }}"
+	default_shell = "{{ $default_shell }}"
+	cloud_providers = {{ $cloud_providers | toJson }}
+
 [git]
 	autoCommit = true
 	autoPush = true

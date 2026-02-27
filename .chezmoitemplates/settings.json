@@ -1,0 +1,24 @@
+{
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": "active",
+    "editor.inlineSuggest.enabled": true,
+    "editor.linkedEditing": true,
+    "editor.multiCursorModifier": "alt",
+    "editor.renderControlCharacters": true,
+    "editor.renderWhitespace": "all",
+    "editor.rulers": [
+        {
+        "color": "#A5FF90",
+        "column": 80
+        },
+        {
+        "color": "#FF628C",
+        "column": 100
+        }
+    ],
+    "editor.stickyScroll.enabled": true,
+    "editor.suggestSelection": "first",
+    "editor.tabCompletion": "on",
+    "editor.tabSize": 2,
+    "files.trimTrailingWhitespace": true
+}
