@@ -41,6 +41,7 @@ Puede ser reutilizado por terceros con conocimientos previos en:
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Requisitos](#requisitos)
 - [Gestión de secretos](#gestión-de-secretos)
+- []()
 - [Uso inicial](#uso-inicial)
 - [Uso diario](#uso-diario)
 - [Testing](#testing)
@@ -72,6 +73,7 @@ El entorno se apoya en:
 - zsh + oh-my-zsh → configuración de shell
 - docker (+ Colima en macOS) → contenedores
 - Bitwarden → gestión de secretos
+- QEMU (KVM) + libvirt + vagrant → virtualización de máquinas
 
 ---
 
@@ -111,6 +113,7 @@ Features disponibles:
 - `gui` → aplicaciones GUI
 - `security` → gestor de contraseñas
 - `shell` → configuración de shell
+- `vm` → virtualización
 
 Cada feature está diseñada para:
 - Ser independiente
@@ -195,6 +198,40 @@ Provider del SDK, evitando almacenar claves localmente.
 
 El uso de `private_` en chezmoi solo limita visibilidad en el sistema destino.
 No implica almacenamiento de secretos en el repositorio.
+
+---
+
+# Virtualización
+
+La virtualización en el presente setup se consigue en sistemas Linux empleando
+la tool nativa de Linux KVM para conseguir así los mejores rendimientos en las
+máquinas virtuales levantadas.
+
+Para acometer esta virtualización se emplean conjuntamente KVM + QEMU + libvirt.
+Este setup puede arrojar dos posibles problemas iniciales:
+
+1. Fallos en la instalación del provider libvirt.
+  1. Incompatibilidad de los boxs empleados con este provider.
+  2. Fallos en la instalación del plugin por dependencias necesarias no
+  instaladas.
+2. Fallos en la ejecución de KVM.
+  1. Procesadores no compatibles con esta tecnología.
+  2. No activada en la BIOS.
+
+Para la resolución de problemas seguir las siguientes indicaciones:
+
+1. Consultar en la descripción del box los providers aceptados.
+2. Asegurarse de disponer de todas las dependencias indicadas en la instalación
+del plugin de vagrant-libvirt.
+3. Consultar si el procesador del host está entre los compatibles de KVM.
+4. Activar en la BIOS la característica de virtualización de la CPU que permita
+ejecutar KVM.
+
+Los enlaces de interés para la resolución de los problemas indicados son:
+
+- [Vagrant Public Registry](https://portal.cloud.hashicorp.com/vagrant/discover)
+- [Processor support](https://www.linux-kvm.org/page/Processor_support)
+- [Enabling virtualization](https://support.faceit.com/hc/en-us/articles/21523645046300-Enabling-virtualization-Intel-VT-x-AMD-SVM)
 
 ---
 

@@ -38,6 +38,10 @@ esac
 # Execute selected features
 for feature in $FEATURES; do
   case "$feature" in
+    ai)
+      echo "Running ai feature setup"
+      sh bootstrap/features/ai.sh
+      ;;
     brew)
       echo "Running brew feature setup"
       sh bootstrap/features/brew.sh
@@ -46,13 +50,29 @@ for feature in $FEATURES; do
       echo "Running bundle feature setup"
       sh bootstrap/features/bundle.sh
       ;;
-    shell)
-      echo "Running shell feature setup"
-      sh bootstrap/features/shell.sh
+    cloud)
+      echo "Running cloud feature setup"
+      sh bootstrap/features/cloud.sh
+      ;;
+    containers)
+      echo "Running containers feature setup"
+      sh bootstrap/features/containers.sh
       ;;
     gui)
       echo "Running gui feature setup"
       sh bootstrap/features/gui.sh
+      ;;
+    security)
+      echo "Running security feature setup"
+      sh bootstrap/features/security.sh
+      ;;
+    shell)
+      echo "Running shell feature setup"
+      sh bootstrap/features/shell.sh
+      ;;
+    vm)
+      echo "Running vm feature setup"
+      sh bootstrap/features/vm.sh
       ;;
     *)
       echo "Unknown feature: $feature"
@@ -61,3 +81,4 @@ for feature in $FEATURES; do
 done
 
 echo "Bootstrap completed."
+echo "You should restart the host for the installed tools run correctly."
