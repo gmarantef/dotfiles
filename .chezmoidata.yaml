@@ -1,16 +1,19 @@
+email: gmarantef@hotmail.com
+
 features:
   - brew
   - bundle
+  - cloud
   - containers
   - gui
-  - shell
   - security
+  - shell
 
 context: personal
 
 default_shell: zsh
 
-cloud_providers: []
+cloud_providers: [aws]
 
 secrets:
   aws:
