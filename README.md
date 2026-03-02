@@ -154,9 +154,9 @@ chezmoi/
 ├── private_dot_folders
 │   ├── ...
 ├── .chezmoi.toml.tmpl
+├── .chezmoidata.yaml
 ├── .chezmoiignore
 ├── .gitignore
-├── chezmoidata.yaml
 ├── dot_files
 ├── private_dot_files
 ├── README.md
@@ -221,7 +221,7 @@ chezmoi init https://github.com/<tu_usuario>/dotfiles.git
 
 Modificar principalmente:
 
-- ```chezmoidata.yaml```
+- ```.chezmoidata.yaml```
 
 - ```.chezmoi.toml.tmpl```
 
@@ -232,6 +232,9 @@ Puede hacerse:
 - Desde ```~/.local/share/chezmoi```
 
 - O usando ```chezmoi edit```
+
+> IMPORTANTE: modificar ```.chezmoidata.yaml``` para adaptar las variables  a
+las necesidades del usuario sobre la configuración del sistema deseado.
 
 ## 5. Aplicar configuración
 
@@ -247,33 +250,15 @@ chezmoi apply
 chezmoi apply --exclude=scripts
 ```
 
-### Apply sobrescribiendo variables
-
-```bash
-chezmoi apply \
-  --data '{
-    "features": ["brew","shell","containers","cloud"],
-    "context": "work",
-    "cloud_providers": ["aws"]
-  }'
-```
-
 ---
 
 ### Flujo interno de ejecución
 
-1. Carga ```chezmoidata.yaml```
-2. Sobrescribe con ```--data``` si se especifica
-3. Genera ```chezmoi.toml``` desde ```.chezmoi.toml.tmpl```
-4. Renderiza y aplica dotfiles
-5. Ejecuta ```run_once_bootstrap.sh.tmpl```
-6. Ejecuta features en orden definido
-
-Para entorno mínimo:
-
-```bash
-chezmoi apply --data '{"features":[]}'
-```
+1. Carga ```.chezmoidata.yaml```
+2. Genera ```chezmoi.toml``` desde ```.chezmoi.toml.tmpl```
+3. Renderiza y aplica dotfiles
+4. Ejecuta ```run_once_bootstrap.sh.tmpl```
+5. Ejecuta features en orden definido
 
 ---
 
