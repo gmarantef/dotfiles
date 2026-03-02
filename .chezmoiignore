@@ -1,14 +1,34 @@
 README.md
 
-{{ if not (has .data.features "gui") }}
-{{ if ne .chezmoi.os "darwin" }}
+# Only manage VSCode settings on GUI feature
+{{- if not (has .features "gui") }}
+Library/Application Support/Code/User/settings.json.tmpl
+.config/Code/User/settings.json.tmpl
+{{- end }}
+
+# Only manage Bitwarden helper on security and aws cloud environment
+{{- if (or (not (has .features "security")) (not (has .cloud_providers "aws"))) }}
+.local/bin/aws-bw-helper.sh
+{{- end }}
+
+# Only manage .aws on cloud feature with aws provider
+{{- if not (has .cloud_providers "aws") }}
+.aws/config
+{{- end }}
+
+# Only manage .Brewfile on bundle feature
+{{- if not (has .features "bundle") }}
+.Brewfile
+{{- end }}
+
+# Only manage .zshrc on shell feature with zsh as default shell
+{{- if (or (not (has .features "shell")) (ne .default_shell "zsh")) }}
+.zshrc
+{{- end }}
+
+{{ if (and (has .features "gui") (ne .chezmoi.os "darwin")) }}
 Library/Application Support/Code/User/settings.json.tmpl
 {{ end }}
-{{ if ne .chezmoi.os "linux" }}
+{{ if (and (has .features "gui") (ne .chezmoi.os "linux")) }}
 .config/Code/User/settings.json.tmpl
 {{ end }}
-{{end}}
-
-{{- if not has "aws" .data.cloud_providers }}
-.aws # only manage .aws on feature with aws cloud provider
-{{- end }}

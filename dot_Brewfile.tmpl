@@ -1,18 +1,22 @@
 # GNU compiler collection
 brew "gcc"
 
-{{ if (and (ne .data.context "minimal") (eq .data.feature "gui"))}}
-{{ if eq .chezmoi.os "linux"}}
+{{- if (has .features "gui") }}
+{{- if eq .chezmoi.os "linux" }}
+# Install VSCode and Obsidian via Flatpak for linux
 flatpak "com.visualstudio.code"
 flatpak "md.obsidian.Obsidian"
-{{else}}
+{{- else }}
+# Otherwise install VSCode and Obsidian via cask
 cask "visual-studio-code"
 cask "obsidian"
-{{end}}
+{{- end }}
 
-{{ if (and (eq .data.context "personal") (eq .data.feature "gui"))}}
-{{ if eq .chezmoi.os "linux"}}
+{{- if (and (eq .context "personal") (has .features "gui")) }}
+{{- if eq .chezmoi.os "linux"}}
+# Install Steam only when personal context via Flatpak for Linux
 flatpak "com.valvesoftware.Steam"
-{{else}}
+{{- else }}
+# Otherwise install Steam only when personal context via cask
 cask "steam"
-{{end}}
+{{- end }}

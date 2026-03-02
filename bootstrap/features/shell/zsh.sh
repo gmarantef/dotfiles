@@ -53,8 +53,8 @@ install_community_plugins() {
         ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
       ;;
     Darwin)
-      brew "zsh-autosuggestions"
-      brew "zsh-syntax-highlighting"
+      brew install zsh-autosuggestions
+      brew install zsh-syntax-highlighting
       ;;
     *)
       echo "No community plugins added: $OS"

@@ -73,20 +73,28 @@ ZSH_THEME="gnzh"
 plugins=(
     git
 
-    docker
-    docker-compose
-
+    {{- if (eq .chezmoi.os "linux") }}
     sudo
     extract
     z
     history
     command-not-found
+    {{- end }}
 
+    {{- if (has .features "containers") }}
+    docker
+    docker-compose
+    {{- end }}
+
+    {{- if (has .features "gui") }}
     vscode
+    {{- end }}
 
+    {{- if (eq .chezmoi.os "linux") }}
     # Community Plugins (must be last)
     zsh-autosuggestions
     zsh-syntax-highlighting
+    {{- end }}
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -120,7 +128,13 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# Config brew for zsh terminal
+{{- if (has .features "brew") }}
+# Config brew for zsh terminal only when brew feature
 if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
   eval "$('/home/linuxbrew/.linuxbrew/bin/brew' shellenv)"
 fi
+{{- if (eq .chezmoi.os "darwin") }}
+source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+{{- end }}
+{{- end }}
