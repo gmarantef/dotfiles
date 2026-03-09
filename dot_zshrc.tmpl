@@ -138,3 +138,7 @@ source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 {{- end }}
 {{- end }}
+
+{{- if (has .features "ai") }}
+export PATH="$HOME/.local/bin:$PATH"
+{{- end }}
