@@ -1,7 +1,10 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "🔧 Preparing Fedora system..."
+# shellcheck source=../../lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
+
+log_step "Preparing Fedora system..."
 
 sudo dnf install -y \
   curl \
@@ -13,3 +16,5 @@ sudo dnf install -y \
   glibc \
   groff \
   less
+
+log_info "Fedora base packages installed."

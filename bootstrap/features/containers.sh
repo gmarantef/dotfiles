@@ -1,31 +1,27 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Sudo at start
-echo "Request sudo permissions..."
-sudo -v
+# shellcheck source=../lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
 
-# Keep alive sudo
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-SUDO_PID=$!
+sudo_keepalive
 
-echo "Setting up container environment..."
+log_step "Setting up container environment..."
 
 install_lazydocker() {
   if command -v brew >/dev/null 2>&1; then
     if ! brew list lazydocker >/dev/null 2>&1; then
-      echo "Installing lazydocker..."
+      log_info "Installing lazydocker..."
       brew install lazydocker
     else
-      echo "lazydocker already installed"
+      log_info "lazydocker already installed."
     fi
   else
-    echo "Homebrew not found. Skipping lazydocker."
+    log_warn "Homebrew not found. Skipping lazydocker."
   fi
 }
 
 install_docker_ubuntu_debian() {
-
   sudo apt update
   sudo apt install -y ca-certificates curl gnupg
 
@@ -48,11 +44,9 @@ install_docker_ubuntu_debian() {
     containerd.io \
     docker-buildx-plugin \
     docker-compose-plugin
-
 }
 
 install_docker_fedora() {
-
   sudo dnf remove -y docker \
     docker-client \
     docker-client-latest \
@@ -73,11 +67,10 @@ install_docker_fedora() {
     containerd.io \
     docker-buildx-plugin \
     docker-compose-plugin
-
 }
 
 configure_docker_arch() {
-  echo "Applying Docker daemon configuration (Arch)..."
+  log_info "Applying Docker daemon configuration (Arch)..."
 
   sudo mkdir -p /etc/docker
 
@@ -103,77 +96,57 @@ EOF
 }
 
 install_docker_arch() {
-
-  sudo pacman -Syu
-
-  sudo pacman -S docker
-
+  sudo pacman -Syu --noconfirm
+  sudo pacman -S --noconfirm docker
   sudo systemctl start docker
   sudo systemctl enable docker
-
-  # Install docker compose because is packaged separately
-  sudo pacman -S docker-compose
-  sudo pacman -S docker-buildx
-
-  # Configure docker
+  sudo pacman -S --noconfirm docker-compose docker-buildx
   configure_docker_arch
-
 }
 
 install_docker_linux() {
   if command -v docker >/dev/null 2>&1; then
-    echo "Docker already installed"
+    log_info "Docker already installed."
     return
   fi
 
-  echo "Installing Docker Engine (Linux)..."
+  log_info "Installing Docker Engine (Linux)..."
 
-  . /etc/os-release
-  case "$ID" in
+  case "$(get_distro)" in
     ubuntu|debian) install_docker_ubuntu_debian ;;
-    fedora) install_docker_fedora ;;
-    arch) install_docker_arch ;;
+    fedora)        install_docker_fedora ;;
+    arch)          install_docker_arch ;;
     *)
-      echo "Unsupported Linux distro for docker: $ID"
-      exit 1
+      log_error "Unsupported Linux distro for docker: $(get_distro)"
       ;;
   esac
 
-  # Add current user to docker group
-  sudo usermod -aG docker "$USER"
-
-  echo "Log out and back in for docker group permissions to apply."
+  sudo usermod -aG docker "${USER}"
+  log_warn "Log out and back in for docker group permissions to apply."
 }
 
 install_docker_macos() {
-  if ! command -v brew >/dev/null 2>&1; then
-    echo "Homebrew required on macOS."
-    exit 1
-  fi
+  require_command brew "Run the 'brew' feature first."
 
-  echo "Installing Colima and docker CLI..."
+  log_info "Installing Colima and docker CLI..."
 
-  # Install docker and colima
   brew install docker
   brew install colima
 
-  # Install DDEV
   brew install drud/ddev/ddev
   brew upgrade ddev
 
-  # Start colima if not running
   if ! colima status >/dev/null 2>&1; then
-    echo "Starting Colima..."
+    log_info "Starting Colima..."
     colima start --cpu 4 --memory 6 --disk 100 --dns=1.1.1.1
   fi
 
-  # Config DDEV
   ddev config global --mutagen-enabled
   brew install nss
   mkcert -install
 }
 
-case "$OS" in
+case "${OS}" in
   Linux)
     install_docker_linux
     ;;
@@ -181,16 +154,10 @@ case "$OS" in
     install_docker_macos
     ;;
   *)
-    echo "Unsupported OS: $OS"
-    exit 1
+    log_error "Unsupported OS: ${OS}"
     ;;
 esac
 
 install_lazydocker
 
-echo "Containers feature ready."
-
-# Kill manually sudo
-kill "$SUDO_PID" 2>/dev/null
-
-echo "containers feature completed successfully."
+log_info "Containers feature completed successfully."

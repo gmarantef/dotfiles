@@ -1,20 +1,23 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "Configuring shell..."
+# shellcheck source=../lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
+
+log_step "Configuring shell..."
 
 if [ -z "${DEFAULT_SHELL}" ]; then
-  echo "No default shell defined."
+  log_warn "No default shell defined, skipping."
   exit 0
 fi
 
-case "$DEFAULT_SHELL" in
+case "${DEFAULT_SHELL}" in
   zsh)
     . "$(dirname "$0")/shell/zsh.sh"
     ;;
   *)
-    echo "Unknown shell: $DEFAULT_SHELL"
+    log_warn "Unknown shell '${DEFAULT_SHELL}', skipping."
     ;;
 esac
 
-echo "shell feature completed successfully."
+log_info "Shell feature completed successfully."

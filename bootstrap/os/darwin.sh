@@ -1,28 +1,25 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "🔧 Preparing macOS base system..."
+# shellcheck source=../lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
 
-# Detect macOS version
+log_step "Preparing macOS base system..."
+
 MACOS_VERSION="$(sw_vers -productVersion)"
 export MACOS_VERSION
-echo "macOS version: $MACOS_VERSION"
+log_info "macOS version: ${MACOS_VERSION}"
 
-# Ensure Xcode Command Line Tools
 if ! xcode-select -p >/dev/null 2>&1; then
-  echo "Installing Xcode Command Line Tools..."
+  log_warn "Xcode Command Line Tools not found. Installing..."
   xcode-select --install
-  echo "⚠️  Please complete installation and re-run bootstrap."
-  exit 1
+  log_error "Please complete the Xcode CLT installation and re-run bootstrap."
 fi
 
-# Ensure basic tools
 for cmd in curl git; do
-  if ! command -v "$cmd" >/dev/null 2>&1; then
-    echo "Missing required tool: $cmd"
-    echo "Install Xcode CLI tools properly."
-    exit 1
+  if ! command -v "${cmd}" >/dev/null 2>&1; then
+    log_error "Missing required tool '${cmd}'. Ensure Xcode CLT is properly installed."
   fi
 done
 
-echo "✅ macOS base ready"
+log_info "macOS base ready."

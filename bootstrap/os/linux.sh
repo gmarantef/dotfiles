@@ -1,27 +1,26 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "🔎 Detecting Linux distribution..."
+# shellcheck source=../lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
 
-if [ -f /etc/os-release ]; then
-  . /etc/os-release
-else
-  echo "Cannot detect Linux distribution"
-  exit 1
+log_info "Detecting Linux distribution..."
+
+if [ ! -f /etc/os-release ]; then
+  log_error "Cannot detect Linux distribution: /etc/os-release not found"
 fi
 
-case "$ID" in
+case "$(get_distro)" in
   ubuntu|debian)
-    sh bootstrap/os/linux/ubuntu.sh
+    bash "${BOOTSTRAP_DIR}/os/linux/ubuntu.sh"
     ;;
   fedora)
-    sh bootstrap/os/linux/fedora.sh
+    bash "${BOOTSTRAP_DIR}/os/linux/fedora.sh"
     ;;
   arch)
-    sh bootstrap/os/linux/arch.sh
+    bash "${BOOTSTRAP_DIR}/os/linux/arch.sh"
     ;;
   *)
-    echo "Unsupported Linux distribution: $ID"
-    exit 1
+    log_error "Unsupported Linux distribution: $(get_distro)"
     ;;
 esac

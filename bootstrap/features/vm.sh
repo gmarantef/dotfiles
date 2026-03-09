@@ -1,21 +1,17 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Sudo at start
-echo "Request sudo permissions..."
-sudo -v
+# shellcheck source=../lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
 
-# Keep alive sudo
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-SUDO_PID=$!
+sudo_keepalive
 
-echo "Configuring Virtual Machine tools ..."
+log_step "Configuring Virtual Machine tools..."
 
 install_virtualization_tools_ubuntu() {
   sudo apt update
 
-  # Install QEMU for KVM and libvirt as virtualization engine
-  echo "Installing QEMU + libvirt ..."
+  log_info "Installing QEMU + libvirt..."
   sudo apt install -y \
     qemu-kvm \
     libvirt-daemon-system \
@@ -27,67 +23,57 @@ install_virtualization_tools_ubuntu() {
     ruby-dev \
     zlib1g-dev
 
-  # Enabling and starting libvirtd
   sudo systemctl enable libvirtd
   sudo systemctl start libvirtd
 
-  # Adding current user to libvirt group
-  sudo usermod -aG libvirt "$USER"
+  sudo usermod -aG libvirt "${USER}"
 
-  # Install vagrant as virtualization orchestrator
-  echo "Installing Vagrant..."
+  log_info "Installing Vagrant..."
   if ! command -v vagrant >/dev/null 2>&1; then
     wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-    sudo apt update && sudo apt install vagrant
+    sudo apt update && sudo apt install -y vagrant
   else
-    echo "Vagrant already installed."
+    log_info "Vagrant already installed."
   fi
 
-  echo "Installing vagrant-libvirt plugin if missing..."
+  log_info "Installing vagrant-libvirt plugin if missing..."
   if ! vagrant plugin list | grep -q vagrant-libvirt; then
     vagrant plugin install vagrant-libvirt
   else
-    echo "vagrant-libvirt already installed."
+    log_info "vagrant-libvirt already installed."
   fi
 }
 
 install_virtualization_tools_linux() {
-  . /etc/os-release
-  case "$ID" in
+  case "$(get_distro)" in
     ubuntu|debian)
       install_virtualization_tools_ubuntu
       ;;
     fedora)
-      echo "fedora support not implemented yet."
+      log_warn "Fedora virtualization support not implemented yet."
       ;;
     arch)
-      echo "arch support not implemented yet."
+      log_warn "Arch virtualization support not implemented yet."
       ;;
     *)
-      echo "Linux distro not officially supported for virtualization: $ID"
-      exit 1
+      log_error "Linux distro not officially supported for virtualization: $(get_distro)"
       ;;
   esac
 }
 
-case "$OS" in
-  linux)
+case "${OS}" in
+  Linux)
     install_virtualization_tools_linux
     ;;
-  macos)
-    echo "macOS support not implemented yet."
-    exit 1
+  Darwin)
+    log_warn "macOS virtualization support not implemented yet."
+    exit 0
     ;;
   *)
-    log "Unsupported OS: $OS"
-    exit 1
+    log_error "Unsupported OS: ${OS}"
     ;;
 esac
 
-echo "Vitualization environment successfully configured."
-
-# Kill manually sudo
-kill "$SUDO_PID" 2>/dev/null
-
-echo "VM feature completed successfully."
+log_info "Virtualization environment successfully configured."
+log_info "VM feature completed successfully."

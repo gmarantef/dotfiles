@@ -1,5 +1,5 @@
-#!/bin/sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
 OS="{{ .chezmoi.os }}"
 ARCHITECTURE="$(uname -m)"
@@ -17,70 +17,66 @@ export DEFAULT_SHELL
 export CLOUD_PROVIDERS
 export AI_AGENTS
 
-echo "Detected OS: $OS"
-echo "Enabled features: $FEATURES"
-echo "Conext for templating: $CONTEXT"
-echo "Cloud providers: $CLOUD_PROVIDERS"
+BOOTSTRAP_DIR="$(cd "$(dirname "$0")/bootstrap" && pwd)"
+export BOOTSTRAP_DIR
 
-# OS specific setup (minimal example)
-case "$OS" in
+# shellcheck source=bootstrap/lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
+
+log_info "Detected OS:       ${OS}"
+log_info "Enabled features:  ${FEATURES}"
+log_info "Context:           ${CONTEXT}"
+log_info "Cloud providers:   ${CLOUD_PROVIDERS}"
+
+# ── Sistema de garantías de dependencias ──────────────────────────────────────
+# Registra features completadas y valida deps antes de ejecutar cada una.
+
+COMPLETED_FEATURES=""
+
+run_feature() {
+  local feature="$1"
+  local script="${BOOTSTRAP_DIR}/features/${feature}.sh"
+
+  # Validar dependencias declaradas en lib.sh::_feature_deps
+  local deps
+  deps="$(_feature_deps "${feature}")"
+  for dep in ${deps}; do
+    if ! echo " ${COMPLETED_FEATURES} " | grep -qw "${dep}"; then
+      log_error "Feature '${feature}' requires '${dep}' to run first. Fix the order of 'features' in .chezmoidata.yaml"
+    fi
+  done
+
+  log_step "Feature: ${feature}"
+  bash "${script}"
+  COMPLETED_FEATURES="${COMPLETED_FEATURES} ${feature}"
+}
+
+# ── Setup de SO ───────────────────────────────────────────────────────────────
+
+log_step "OS setup: ${OS}"
+case "${OS}" in
   linux)
-    echo "Running Linux base setup"
-    sh bootstrap/os/linux.sh
+    bash "${BOOTSTRAP_DIR}/os/linux.sh"
     ;;
   darwin)
-    echo "Running macOS base setup"
-    sh bootstrap/os/darwin.sh
+    bash "${BOOTSTRAP_DIR}/os/darwin.sh"
     ;;
   *)
-    echo "Unsupported OS: $OS"
+    log_error "Unsupported OS: ${OS}"
     ;;
 esac
 
-# Execute selected features
-for feature in $FEATURES; do
-  case "$feature" in
-    ai)
-      echo "Running ai feature setup"
-      sh bootstrap/features/ai.sh
-      ;;
-    brew)
-      echo "Running brew feature setup"
-      sh bootstrap/features/brew.sh
-      ;;
-    bundle)
-      echo "Running bundle feature setup"
-      sh bootstrap/features/bundle.sh
-      ;;
-    cloud)
-      echo "Running cloud feature setup"
-      sh bootstrap/features/cloud.sh
-      ;;
-    containers)
-      echo "Running containers feature setup"
-      sh bootstrap/features/containers.sh
-      ;;
-    gui)
-      echo "Running gui feature setup"
-      sh bootstrap/features/gui.sh
-      ;;
-    security)
-      echo "Running security feature setup"
-      sh bootstrap/features/security.sh
-      ;;
-    shell)
-      echo "Running shell feature setup"
-      sh bootstrap/features/shell.sh
-      ;;
-    vm)
-      echo "Running vm feature setup"
-      sh bootstrap/features/vm.sh
+# ── Ejecución de features ─────────────────────────────────────────────────────
+
+for feature in ${FEATURES}; do
+  case "${feature}" in
+    ai|brew|bundle|cloud|containers|gui|security|shell|vm)
+      run_feature "${feature}"
       ;;
     *)
-      echo "Unknown feature: $feature"
+      log_warn "Unknown feature '${feature}', skipping."
       ;;
   esac
 done
 
-echo "Bootstrap completed."
-echo "You should restart the host for the installed tools run correctly."
+log_info "Bootstrap completed. Restart the host for all changes to take effect."

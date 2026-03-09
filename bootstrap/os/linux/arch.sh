@@ -1,7 +1,10 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "🔧 Preparing Arch system..."
+# shellcheck source=../../lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
+
+log_step "Preparing Arch system..."
 
 sudo pacman -Sy --noconfirm \
   curl \
@@ -12,3 +15,5 @@ sudo pacman -Sy --noconfirm \
   glibc \
   groff \
   less
+
+log_info "Arch base packages installed."

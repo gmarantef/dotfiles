@@ -1,37 +1,32 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Sudo at start
-echo "Request sudo permissions..."
-sudo -v
+# shellcheck source=../lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
 
-# Keep alive sudo
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-SUDO_PID=$!
+sudo_keepalive
 
-echo "Configuring GUI packages ..."
+log_step "Configuring GUI packages..."
 
-# Install Google Chrome if not exists
 if ! command -v google-chrome >/dev/null 2>&1; then
-  echo "Installing Google Chrome ..."
-  case "$OS" in
+  log_info "Installing Google Chrome..."
+  case "${OS}" in
     Linux)
       wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
       sudo apt install -y ./google-chrome-stable_current_amd64.deb
       rm -f google-chrome-stable_current_amd64.deb
       ;;
     Darwin)
+      require_command brew "Run the 'brew' feature first."
       brew install --cask google-chrome
       ;;
     *)
-      echo "OS not supported for Google Chrome: $OS"
-      exit 0
+      log_warn "OS not supported for Google Chrome: ${OS}"
+      ;;
   esac
+  log_info "Google Chrome successfully configured."
+else
+  log_info "Google Chrome already installed."
 fi
 
-echo "Google Chrome successfully configured."
-
-# Kill manually sudo
-kill "$SUDO_PID" 2>/dev/null
-
-echo "GUI feature completed successfully."
+log_info "GUI feature completed successfully."

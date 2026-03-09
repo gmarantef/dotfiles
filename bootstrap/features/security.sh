@@ -1,67 +1,46 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Sudo at start
-echo "Request sudo permissions..."
-sudo -v
+# shellcheck source=../lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
 
-# Keep alive sudo
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-SUDO_PID=$!
+sudo_keepalive
 
-echo "Installing security tools..."
+log_step "Installing security tools..."
+
+require_command brew "Run the 'brew' feature first."
 
 install_bitwarden_cli() {
-  if command -v brew >/dev/null 2>&1; then
-    brew install bitwarden-cli
-  else
-    echo "brew feature required for bitwarden-cli"
-    exit 1
-  fi
+  brew install bitwarden-cli
 }
 
 install_bitwarden_gui_linux() {
   if command -v flatpak >/dev/null 2>&1; then
     flatpak install -y flathub com.bitwarden.desktop
   else
-    echo "brew feature required for bitwarden GUI"
-    exit 1
+    log_warn "flatpak not found. Skipping Bitwarden GUI installation."
   fi
 }
 
 install_bitwarden_gui_macos() {
-  if command -v brew >/dev/null 2>&1; then
-    brew install --cask bitwarden
-  else
-    echo "brew feature required for bitwarden GUI"
-    exit 1
-  fi
+  brew install --cask bitwarden
 }
 
-# CLI siempre
+log_info "Installing Bitwarden CLI..."
 install_bitwarden_cli
 
-# GUI solo si feature gui activa
-if echo "$FEATURES" | grep -q "gui"; then
-  case "$OS" in
-    Linux)
-      install_bitwarden_gui_linux
-      ;;
-    Darwin)
-      install_bitwarden_gui_macos
-      ;;
+if has_feature "gui"; then
+  log_info "Installing Bitwarden GUI..."
+  case "${OS}" in
+    Linux)   install_bitwarden_gui_linux ;;
+    Darwin)  install_bitwarden_gui_macos ;;
   esac
 fi
 
-echo "Bitwarden successfully configured."
+log_info "Bitwarden successfully configured."
 
-echo "Installing jq..."
-if command -v brew >/dev/null 2>&1; then
-  brew install jq
-fi
-echo "jq successfully configured."
+log_info "Installing jq..."
+brew install jq
+log_info "jq successfully configured."
 
-# Kill manually sudo
-kill "$SUDO_PID" 2>/dev/null
-
-echo "security feature completed successfully."
+log_info "Security feature completed successfully."

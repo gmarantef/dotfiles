@@ -1,28 +1,16 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Sudo at start
-echo "Request sudo permissions..."
-sudo -v
+# shellcheck source=../lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
 
-# Keep alive sudo
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-SUDO_PID=$!
+sudo_keepalive
 
-echo "Installing packages from Brewfile..."
+log_step "Installing packages from Brewfile..."
 
-# Check for homebrew into the system
-if ! command -v brew >/dev/null 2>&1; then
-  echo "Homebrew is needed for bundle installation."
-  exit 1
-fi
+require_command brew "Run the 'brew' feature first."
 
-# Packages installation from homebrew bundle
-brew bundle --file="$HOME/.Brewfile"
+brew bundle --file="${HOME}/.Brewfile"
 
-echo "Brewfile packages installed."
-
-# Kill manually sudo
-kill "$SUDO_PID" 2>/dev/null
-
-echo "Homebrew bundle feature completed successfully."
+log_info "Brewfile packages installed."
+log_info "Bundle feature completed successfully."

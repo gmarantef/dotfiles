@@ -1,83 +1,58 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-#!/usr/bin/env sh
-set -e
+# shellcheck source=../../lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
 
-# Sudo at start
-echo "Request sudo permissions..."
-sudo -v
-
-# Keep alive sudo
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-SUDO_PID=$!
-
-install_aws_cli() {
-  if command -v aws >/dev/null 2>&1; then
-    echo "AWS CLI already installed"
-    return
-  fi
-
-  echo "Installing AWS CLI v2 ..."
-
-  case "$OS" in
-    Linux)
-      install_aws_cli_linux
-      ;;
-    Darwin)
-      install_aws_cli_macos
-      ;;
-    *)
-      echo "Unsupported OS for AWS CLI"
-      exit 1
-      ;;
-  esac
-}
+sudo_keepalive
 
 install_aws_cli_linux() {
-  TMP_DIR="$(mktemp -d)"
-  cd "$TMP_DIR"
+  local tmp_dir
+  tmp_dir="$(mktemp -d)"
+  cd "${tmp_dir}"
 
-  if [ "$ARCHITECTURE" = "x86_64" ]; then
-    URL="https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
-  elif echo "$ARCHITECTURE" | grep -qi arm; then
-    URL="https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip"
+  local url
+  if [ "${ARCHITECTURE}" = "x86_64" ]; then
+    url="https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+  elif echo "${ARCHITECTURE}" | grep -qi arm; then
+    url="https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip"
   else
-    echo "Unsupported architecture: $ARCHITECTURE"
-    exit 1
+    log_error "Unsupported architecture: ${ARCHITECTURE}"
   fi
 
-  curl -fsSL "$URL" -o awscliv2.zip
+  curl -fsSL "${url}" -o awscliv2.zip
   unzip -q awscliv2.zip
-
   sudo ./aws/install
 
   cd - >/dev/null
-  rm -rf "$TMP_DIR"
+  rm -rf "${tmp_dir}"
 }
 
 install_aws_cli_macos() {
-  TMP_DIR="$(mktemp -d)"
-  cd "$TMP_DIR"
+  local tmp_dir
+  tmp_dir="$(mktemp -d)"
+  cd "${tmp_dir}"
 
-  URL="https://awscli.amazonaws.com/AWSCLIV2.pkg"
-
-  curl -fsSL "$URL" -o AWSCLIV2.pkg
-
-  # Instala para el sistema (requiere sudo)
+  curl -fsSL https://awscli.amazonaws.com/AWSCLIV2.pkg -o AWSCLIV2.pkg
   sudo installer -pkg AWSCLIV2.pkg -target /
 
   cd - >/dev/null
-  rm -rf "$TMP_DIR"
+  rm -rf "${tmp_dir}"
 }
 
-echo "Configuring AWS CLI ..."
+log_step "Configuring AWS CLI..."
 
-install_aws_cli
+if command -v aws >/dev/null 2>&1; then
+  log_info "AWS CLI already installed."
+  exit 0
+fi
 
-echo "AWS CLI successfully configured."
+log_info "Installing AWS CLI v2..."
 
-# Kill manually sudo
-kill "$SUDO_PID" 2>/dev/null
+case "${OS}" in
+  Linux)   install_aws_cli_linux ;;
+  Darwin)  install_aws_cli_macos ;;
+  *)       log_error "Unsupported OS for AWS CLI: ${OS}" ;;
+esac
 
-echo "AWS cloud provider completed successfully."
+log_info "AWS cloud provider completed successfully."

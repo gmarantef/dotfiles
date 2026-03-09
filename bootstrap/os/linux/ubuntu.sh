@@ -1,7 +1,10 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "🔧 Preparing Ubuntu/Debian system..."
+# shellcheck source=../../lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
+
+log_step "Preparing Ubuntu/Debian system..."
 
 sudo apt update
 sudo apt install -y \
@@ -14,3 +17,5 @@ sudo apt install -y \
   glibc \
   groff \
   less
+
+log_info "Ubuntu/Debian base packages installed."

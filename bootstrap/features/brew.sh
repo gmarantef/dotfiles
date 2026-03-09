@@ -1,19 +1,15 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Sudo at start
-echo "Request sudo permissions..."
-sudo -v
+# shellcheck source=../lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
 
-# Keep alive sudo
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-SUDO_PID=$!
+sudo_keepalive
 
-echo "Configuring Homebrew..."
+log_step "Configuring Homebrew..."
 
 install_basic_plus_flatpak_linux() {
-  . /etc/os-release
-  case "$ID" in
+  case "$(get_distro)" in
     ubuntu|debian)
       sudo apt update
       sudo apt install -y build-essential procps curl file git wget flatpak
@@ -21,14 +17,13 @@ install_basic_plus_flatpak_linux() {
       ;;
     fedora)
       sudo dnf group install development-tools
-      sudo dnf install procps-ng curl file
+      sudo dnf install -y procps-ng curl file
       ;;
     arch)
-      sudo pacman -S base-devel procps-ng curl file git flatpak
+      sudo pacman -S --noconfirm base-devel procps-ng curl file git flatpak
       ;;
     *)
-      echo "Linux distro not officially supported for brew: $ID"
-      exit 1
+      log_error "Linux distro not officially supported for brew: $(get_distro)"
       ;;
   esac
 }
@@ -38,14 +33,12 @@ install_homebrew() {
     "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 }
 
-# Check for homebrew into the system
 if command -v brew >/dev/null 2>&1; then
-  echo "Homebrew already installed"
+  log_info "Homebrew already installed."
   exit 0
 fi
 
-# Homebrew installation
-case "$OS" in
+case "${OS}" in
   Linux)
     install_basic_plus_flatpak_linux
     install_homebrew
@@ -54,14 +47,8 @@ case "$OS" in
     install_homebrew
     ;;
   *)
-    echo "OS not supported for brew: $OS"
-    exit 1
+    log_error "OS not supported for brew: ${OS}"
     ;;
 esac
 
-echo "Homebrew successfully configured."
-
-# Kill manually sudo
-kill "$SUDO_PID" 2>/dev/null
-
-echo "Brew feature completed successfully."
+log_info "Homebrew successfully configured."

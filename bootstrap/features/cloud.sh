@@ -1,24 +1,29 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-CLOUD_PROVIDERS="{{ join " " .data.cloud_providers }}"
+# shellcheck source=../lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
 
-echo "Configuring cloud environment..."
+# CLOUD_PROVIDERS se hereda del entorno exportado por run_once_bootstrap.sh.tmpl
+# (La línea de template que había aquí era un bug: este fichero no es .tmpl)
+
+log_step "Configuring cloud environment..."
 
 if [ -z "${CLOUD_PROVIDERS}" ]; then
-  echo "No cloud providers defined."
+  log_warn "No cloud providers defined, skipping."
   exit 0
 fi
 
-for provider in $CLOUD_PROVIDERS; do
-  case "$provider" in
+for provider in ${CLOUD_PROVIDERS}; do
+  case "${provider}" in
     aws)
+      log_info "Running AWS provider setup..."
       . "$(dirname "$0")/cloud/aws.sh"
       ;;
     *)
-      echo "Unknown cloud provider: $provider"
+      log_warn "Unknown cloud provider '${provider}', skipping."
       ;;
   esac
 done
 
-echo "Cloud feature completed successfully."
+log_info "Cloud feature completed successfully."

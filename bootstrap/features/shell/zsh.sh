@@ -1,19 +1,15 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Sudo at start
-echo "Request sudo permissions..."
-sudo -v
+# shellcheck source=../../lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
 
-# Keep alive sudo
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-SUDO_PID=$!
+sudo_keepalive
 
-echo "Configuring zsh shell..."
+log_step "Configuring zsh shell..."
 
 install_zsh_linux() {
-  . /etc/os-release
-  case "$ID" in
+  case "$(get_distro)" in
     ubuntu|debian)
       sudo apt install -y zsh
       ;;
@@ -21,82 +17,63 @@ install_zsh_linux() {
       sudo dnf install -y zsh
       ;;
     arch)
-      sudo pacman -S zsh
+      sudo pacman -S --noconfirm zsh
+      ;;  # bug fix: ;; faltante en el caso arch
     *)
-      echo "Unsupported Linux distro for zsh: $ID"
-      exit 1
+      log_error "Unsupported Linux distro for zsh: $(get_distro)"
       ;;
   esac
 }
 
 install_zsh_macos() {
-  # zsh already comes in macOS
   if ! command -v zsh >/dev/null 2>&1; then
-    if command -v brew >/dev/null 2>&1; then
-      brew "zsh"
-    else
-      echo "Brew is needed for installing zsh in macOS"
-      exit 1
-    fi
+    require_command brew "Run the 'brew' feature first."
+    brew install zsh
   fi
 }
 
 install_community_plugins() {
-  case "$OS" in
+  case "${OS}" in
     Linux)
-      # Clone zsh-autosuggestions community plugin to oh-my-zsh
       git clone https://github.com/zsh-users/zsh-autosuggestions \
-      ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-
-      # Clone zsh-syntax-highlighting community plugin to oh-my-zsh
+        "${ZSH_CUSTOM:-${HOME}/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
       git clone https://github.com/zsh-users/zsh-syntax-highlighting \
-        ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+        "${ZSH_CUSTOM:-${HOME}/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
       ;;
     Darwin)
       brew install zsh-autosuggestions
       brew install zsh-syntax-highlighting
       ;;
     *)
-      echo "No community plugins added: $OS"
+      log_warn "No community plugins added for OS: ${OS}"
       ;;
   esac
 }
 
-# Install zsh if not exists
 if ! command -v zsh >/dev/null 2>&1; then
-  echo "Installing zsh ..."
-  case "$OS" in
-    Linux) install_zsh_linux ;;
-    Darwin) install_zsh_macos ;;
-    *)
-      echo "OS not supported for zsh: $OS"
-      exit 1
-      ;;
+  log_info "Installing zsh..."
+  case "${OS}" in
+    Linux)   install_zsh_linux ;;
+    Darwin)  install_zsh_macos ;;
+    *)       log_error "OS not supported for zsh: ${OS}" ;;
   esac
 fi
 
 ZSH_PATH="$(command -v zsh)"
 
-# Install oh-my-zsh if not exists
-if [ ! -d "$HOME/.oh-my-zsh" ]; then
-  echo "Installing oh-my-zsh ..."
+if [ ! -d "${HOME}/.oh-my-zsh" ]; then
+  log_info "Installing oh-my-zsh..."
   RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c \
     "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
 
-# Install community plugins
-echo "Installing oh-my-zsh community plugins ..."
+log_info "Installing oh-my-zsh community plugins..."
 install_community_plugins
 
-# Cambiar shell por defecto
-if [ "$SHELL" != "$ZSH_PATH" ]; then
-  echo "Setting zsh as default shell..."
-  chsh -s "$ZSH_PATH"
+if [ "${SHELL}" != "${ZSH_PATH}" ]; then
+  log_info "Setting zsh as default shell..."
+  chsh -s "${ZSH_PATH}"
 fi
 
-echo "zsh and oh-my-zsh successfully configured."
-
-# Kill manually sudo
-kill "$SUDO_PID" 2>/dev/null
-
-echo "zsh shell completed successfully."
+log_info "zsh and oh-my-zsh successfully configured."
+log_info "zsh shell completed successfully."

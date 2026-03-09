@@ -1,23 +1,26 @@
-#!/usr/bin/env sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "Configuring AI agents..."
+# shellcheck source=../lib.sh
+. "${BOOTSTRAP_DIR}/lib.sh"
+
+log_step "Configuring AI agents..."
 
 if [ -z "${AI_AGENTS}" ]; then
-  echo "No AI agents defined."
+  log_warn "No AI agents defined, skipping."
   exit 0
 fi
 
-for agent in $AI_AGENTS; do
-  case "$agent" in
+for agent in ${AI_AGENTS}; do
+  case "${agent}" in
     claude_code)
-      echo "Running claude_code agent setup"
+      log_info "Running claude_code agent setup..."
       . "$(dirname "$0")/ai/claude_code.sh"
       ;;
     *)
-      echo "Unknown AI agent: $agent"
+      log_warn "Unknown AI agent '${agent}', skipping."
       ;;
   esac
 done
 
-echo "ai feature completed successfully."
+log_info "AI feature completed successfully."
