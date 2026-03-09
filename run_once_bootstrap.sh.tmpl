@@ -7,6 +7,7 @@ FEATURES="{{ join " " .features }}"
 CONTEXT="{{ .context }}"
 DEFAULT_SHELL="{{ .default_shell }}"
 CLOUD_PROVIDERS="{{ join " " .cloud_providers }}"
+AI_AGENTS="{{ join " " .ai_agents }}"
 
 export OS
 export ARCHITECTURE
@@ -14,6 +15,7 @@ export FEATURES
 export CONTEXT
 export DEFAULT_SHELL
 export CLOUD_PROVIDERS
+export AI_AGENTS
 
 echo "Detected OS: $OS"
 echo "Enabled features: $FEATURES"

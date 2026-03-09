@@ -41,7 +41,9 @@ Puede ser reutilizado por terceros con conocimientos previos en:
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Requisitos](#requisitos)
 - [Gestión de secretos](#gestión-de-secretos)
-- []()
+- [Virtualización](#virtualización)
+  - [Vagrant](#vagrant)
+- [Asistente IA](#asistente-ia)
 - [Uso inicial](#uso-inicial)
 - [Uso diario](#uso-diario)
 - [Testing](#testing)
@@ -232,6 +234,46 @@ Los enlaces de interés para la resolución de los problemas indicados son:
 - [Vagrant Public Registry](https://portal.cloud.hashicorp.com/vagrant/discover)
 - [Processor support](https://www.linux-kvm.org/page/Processor_support)
 - [Enabling virtualization](https://support.faceit.com/hc/en-us/articles/21523645046300-Enabling-virtualization-Intel-VT-x-AMD-SVM)
+
+## Vagrant
+
+---
+
+# Asistente IA
+
+La feature `ai` permite instalar agentes de IA de forma modular, siguiendo la
+misma arquitectura que el resto de features del proyecto.
+
+## Configuración
+
+Los agentes a instalar se declaran en `.chezmoidata.yaml`:
+
+```yaml
+ai_agents:
+  - claude_code
+```
+
+## Agentes disponibles
+
+### claude_code
+
+Instala [Claude Code](https://claude.ai/code), el CLI oficial de Anthropic,
+usando el instalador nativo mediante curl:
+
+```bash
+curl -fsSL https://claude.ai/install.sh | bash
+```
+
+Compatible con macOS y Linux. La instalación es idempotente: si el binario
+`claude` ya está presente en el sistema, se omite.
+
+La instalación nativa se actualiza automáticamente en segundo plano.
+
+## Añadir nuevos agentes
+
+1. Añadir el nombre del agente a `ai_agents` en `.chezmoidata.yaml`
+2. Crear el script `bootstrap/features/ai/<nombre_agente>.sh`
+3. Registrar el nuevo `case` en `bootstrap/features/ai.sh`
 
 ---
 

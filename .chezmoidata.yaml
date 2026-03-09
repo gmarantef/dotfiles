@@ -8,10 +8,14 @@ features:
   - gui
   - security
   - shell
+  - ai
 
 context: personal
 
 default_shell: zsh
+
+ai_agents:
+  - claude_code
 
 cloud_providers: [aws]
 
