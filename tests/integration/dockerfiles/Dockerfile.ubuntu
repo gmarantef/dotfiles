@@ -1,0 +1,25 @@
+FROM ubuntu:22.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    sudo curl git ca-certificates build-essential file gnupg wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Usuario no-root con sudo sin contraseña (homebrew no funciona como root)
+RUN useradd -m -s /bin/bash testuser \
+    && echo "testuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+COPY --chown=testuser:testuser bootstrap/ /home/testuser/bootstrap/
+
+USER testuser
+WORKDIR /home/testuser
+
+ENV BOOTSTRAP_DIR=/home/testuser/bootstrap
+ENV OS=linux
+ENV ARCHITECTURE=x86_64
+ENV FEATURES="brew bundle shell cloud ai containers security gui"
+ENV CONTEXT=personal
+ENV DEFAULT_SHELL=zsh
+ENV CLOUD_PROVIDERS=aws
+ENV AI_AGENTS=claude_code

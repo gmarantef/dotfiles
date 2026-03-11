@@ -91,7 +91,7 @@ EOF
 net.ipv4.ip_forward = 1
 EOF
 
-  sudo sysctl --system
+  sudo sysctl --system || log_warn "sysctl --system failed. Network forwarding may need manual config."
   sudo systemctl restart docker
 }
 

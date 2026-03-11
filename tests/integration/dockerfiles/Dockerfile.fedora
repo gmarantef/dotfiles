@@ -1,0 +1,23 @@
+FROM fedora:40
+
+RUN dnf install -y \
+    sudo curl git ca-certificates file gnupg2 wget \
+    && dnf clean all
+
+# Usuario no-root con sudo sin contraseña
+RUN useradd -m -s /bin/bash testuser \
+    && echo "testuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+COPY --chown=testuser:testuser bootstrap/ /home/testuser/bootstrap/
+
+USER testuser
+WORKDIR /home/testuser
+
+ENV BOOTSTRAP_DIR=/home/testuser/bootstrap
+ENV OS=linux
+ENV ARCHITECTURE=x86_64
+ENV FEATURES="brew bundle shell cloud ai containers security"
+ENV CONTEXT=personal
+ENV DEFAULT_SHELL=zsh
+ENV CLOUD_PROVIDERS=aws
+ENV AI_AGENTS=claude_code

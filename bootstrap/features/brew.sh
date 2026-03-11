@@ -13,7 +13,8 @@ install_basic_plus_flatpak_linux() {
     ubuntu|debian)
       sudo apt update
       sudo apt install -y build-essential procps curl file git wget flatpak
-      flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+      flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo \
+        || log_warn "Could not add flathub remote. Run manually after setup if needed."
       ;;
     fedora)
       sudo dnf group install development-tools
