@@ -1,0 +1,44 @@
+# Claude Code context (local only)
+.claude/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+.fuse_hidden*
+.Trash-*
+.nfs*
+
+# Editors
+*.swp
+*.swo
+.idea/
+*.iml
+
+# Secrets y credenciales (nunca deben llegar al repo)
+*.pem
+*.key
+*.p12
+*.pfx
+.env
+.env.*
+!.env.example
+secrets/
+credentials/
+
+# chezmoi — ficheros generados/temporales
+.chezmoistate.boltdb
+chezmoi.log
+
+# Tests — artefactos temporales
+tests/integration/logs/
+tests/integration/.tmp/
+*.log
+
+# Temporales genéricos
+*.tmp
+*.bak
+*.orig
