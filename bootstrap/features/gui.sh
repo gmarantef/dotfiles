@@ -8,15 +8,32 @@ sudo_keepalive
 
 log_step "Configuring GUI packages..."
 
+install_chrome_linux() {
+  local arch
+  arch=$(dpkg --print-architecture 2>/dev/null || echo "unknown")
+  if [ "${arch}" != "amd64" ]; then
+    log_warn "Google Chrome only provides official Linux packages for amd64. Skipping (arch: ${arch})."
+    return
+  fi
+
+  curl -fsSL https://dl.google.com/linux/linux_signing_key.pub \
+    | sudo gpg --dearmor -o /etc/apt/keyrings/google-chrome.gpg
+
+  echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google-chrome.gpg] \
+https://dl.google.com/linux/chrome/deb/ stable main" \
+    | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
+
+  sudo apt update
+  sudo apt install -y google-chrome-stable
+}
+
 if ! command -v google-chrome >/dev/null 2>&1; then
   log_info "Installing Google Chrome..."
   case "${OS}" in
-    Linux)
-      wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-      sudo apt install -y ./google-chrome-stable_current_amd64.deb
-      rm -f google-chrome-stable_current_amd64.deb
+    linux)
+      install_chrome_linux
       ;;
-    Darwin)
+    darwin)
       require_command brew "Run the 'brew' feature first."
       brew install --cask google-chrome
       ;;

@@ -133,7 +133,7 @@ install_docker_macos() {
   brew install docker
   brew install colima
 
-  brew install drud/ddev/ddev
+  brew install ddev/ddev/ddev
   brew upgrade ddev
 
   if ! colima status >/dev/null 2>&1; then
@@ -142,15 +142,15 @@ install_docker_macos() {
   fi
 
   ddev config global --mutagen-enabled
-  brew install nss
+  brew install nss mkcert
   mkcert -install
 }
 
 case "${OS}" in
-  Linux)
+  linux)
     install_docker_linux
     ;;
-  Darwin)
+  darwin)
     install_docker_macos
     ;;
   *)

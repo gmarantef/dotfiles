@@ -18,7 +18,7 @@ install_zsh_linux() {
       ;;
     arch)
       sudo pacman -S --noconfirm zsh
-      ;;  # bug fix: ;; faltante en el caso arch
+      ;;
     *)
       log_error "Unsupported Linux distro for zsh: $(get_distro)"
       ;;
@@ -34,13 +34,18 @@ install_zsh_macos() {
 
 install_community_plugins() {
   case "${OS}" in
-    Linux)
-      git clone https://github.com/zsh-users/zsh-autosuggestions \
-        "${ZSH_CUSTOM:-${HOME}/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
-      git clone https://github.com/zsh-users/zsh-syntax-highlighting \
-        "${ZSH_CUSTOM:-${HOME}/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
+    linux)
+      local plugins_dir="${ZSH_CUSTOM:-${HOME}/.oh-my-zsh/custom}/plugins"
+      if [ ! -d "${plugins_dir}/zsh-autosuggestions" ]; then
+        git clone https://github.com/zsh-users/zsh-autosuggestions \
+          "${plugins_dir}/zsh-autosuggestions"
+      fi
+      if [ ! -d "${plugins_dir}/zsh-syntax-highlighting" ]; then
+        git clone https://github.com/zsh-users/zsh-syntax-highlighting \
+          "${plugins_dir}/zsh-syntax-highlighting"
+      fi
       ;;
-    Darwin)
+    darwin)
       brew install zsh-autosuggestions
       brew install zsh-syntax-highlighting
       ;;
@@ -53,8 +58,8 @@ install_community_plugins() {
 if ! command -v zsh >/dev/null 2>&1; then
   log_info "Installing zsh..."
   case "${OS}" in
-    Linux)   install_zsh_linux ;;
-    Darwin)  install_zsh_macos ;;
+    linux)   install_zsh_linux ;;
+    darwin)  install_zsh_macos ;;
     *)       log_error "OS not supported for zsh: ${OS}" ;;
   esac
 fi

@@ -40,11 +40,11 @@ if command -v brew >/dev/null 2>&1; then
 fi
 
 case "${OS}" in
-  Linux)
+  linux)
     install_basic_plus_flatpak_linux
     install_homebrew
     ;;
-  Darwin)
+  darwin)
     install_homebrew
     ;;
   *)

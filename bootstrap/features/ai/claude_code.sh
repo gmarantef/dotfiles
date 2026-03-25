@@ -11,6 +11,9 @@ if command -v claude >/dev/null 2>&1; then
   exit 0
 fi
 
-curl -fsSL https://claude.ai/install.sh | bash
+install_script="$(mktemp)"
+curl -fsSL https://claude.ai/install.sh -o "${install_script}"
+bash "${install_script}"
+rm -f "${install_script}"
 
 log_info "claude_code completed successfully."

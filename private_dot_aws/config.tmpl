@@ -1,8 +1,8 @@
-{{- if has "security" .data.features }}
+{{- if (has .features "security") }}
 
-{{- $item := index .data.secrets.aws .data.context -}}
+{{- $item := index .secrets.aws .context -}}
 
-[profile {{ .data.context }}]
+[profile {{ .context }}]
     region = eu-west-1
     output = json
     credential_process = {{ .chezmoi.homeDir }}/.local/bin/aws-bw-helper {{ $item }}

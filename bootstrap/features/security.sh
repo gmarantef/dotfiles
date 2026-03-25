@@ -32,8 +32,8 @@ install_bitwarden_cli
 if has_feature "gui"; then
   log_info "Installing Bitwarden GUI..."
   case "${OS}" in
-    Linux)   install_bitwarden_gui_linux ;;
-    Darwin)  install_bitwarden_gui_macos ;;
+    linux)   install_bitwarden_gui_linux ;;
+    darwin)  install_bitwarden_gui_macos ;;
   esac
 fi
 

@@ -25,7 +25,7 @@ sudo_keepalive() {
   while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
   SUDO_PID=$!
   export SUDO_PID
-  trap 'sudo_release' EXIT
+  trap 'sudo_release' EXIT INT TERM
 }
 
 sudo_release() {
@@ -64,11 +64,21 @@ require_command() {
 }
 
 # Devuelve las features de las que depende una feature dada (space-separated)
+# Algunas dependencias son condicionales al OS (ej. brew solo es req en macOS para shell/containers/gui)
 _feature_deps() {
   case "$1" in
-    bundle)     echo "brew" ;;
-    security)   echo "brew" ;;
-    *)          echo "" ;;
+    bundle)
+      echo "brew"
+      ;;
+    security)
+      echo "brew"
+      ;;
+    shell|containers|gui)
+      [ "${OS:-}" = "darwin" ] && echo "brew" || echo ""
+      ;;
+    *)
+      echo ""
+      ;;
   esac
 }
 

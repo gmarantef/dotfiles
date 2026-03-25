@@ -50,8 +50,8 @@ fi
 log_info "Installing AWS CLI v2..."
 
 case "${OS}" in
-  Linux)   install_aws_cli_linux ;;
-  Darwin)  install_aws_cli_macos ;;
+  linux)   install_aws_cli_linux ;;
+  darwin)  install_aws_cli_macos ;;
   *)       log_error "Unsupported OS for AWS CLI: ${OS}" ;;
 esac
 
