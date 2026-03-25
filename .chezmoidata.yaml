@@ -17,7 +17,8 @@ default_shell: zsh
 ai_agents:
   - claude_code
 
-cloud_providers: [aws]
+cloud_providers:
+  - aws
 
 secrets:
   aws:

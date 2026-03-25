@@ -74,7 +74,7 @@ for feature in ${FEATURES}; do
       run_feature "${feature}"
       ;;
     *)
-      log_warn "Unknown feature '${feature}', skipping."
+      log_error "Unknown feature '${feature}'. Check 'features' list in .chezmoidata.yaml."
       ;;
   esac
 done

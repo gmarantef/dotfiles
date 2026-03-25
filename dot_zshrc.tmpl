@@ -134,8 +134,10 @@ if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
   eval "$('/home/linuxbrew/.linuxbrew/bin/brew' shellenv)"
 fi
 {{- if (eq .chezmoi.os "darwin") }}
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+BREW_PREFIX="$(brew --prefix)"
+source "${BREW_PREFIX}/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+source "${BREW_PREFIX}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+unset BREW_PREFIX
 {{- end }}
 {{- end }}
 
