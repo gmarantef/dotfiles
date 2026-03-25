@@ -7,6 +7,14 @@ set -euo pipefail
 sudo_keepalive
 
 install_aws_cli_linux() {
+  if ! command -v unzip >/dev/null 2>&1; then
+    case "$(get_distro)" in
+      ubuntu|debian) sudo apt update -qq && sudo apt install -y unzip ;;
+      fedora)        sudo dnf install -y unzip ;;
+      arch)          sudo pacman -S --noconfirm unzip ;;
+    esac
+  fi
+
   local tmp_dir
   tmp_dir="$(mktemp -d)"
   cd "${tmp_dir}"

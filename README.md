@@ -187,7 +187,7 @@ O directamente:
 
 | Distro | Estado |
 |--------|--------|
-| Ubuntu | ⬜ Pendiente |
+| Ubuntu | ✅ Validado (brew, bundle, shell, cloud, ai, security, containers, gui) |
 | Fedora | ⬜ Pendiente |
 | Arch   | ⬜ Pendiente |
 | macOS  | ⬜ Pendiente (fuera del scope Docker) |

@@ -121,7 +121,7 @@ install_docker_linux() {
       ;;
   esac
 
-  sudo usermod -aG docker "${USER}"
+  sudo usermod -aG docker "$(whoami)"
   log_warn "Log out and back in for docker group permissions to apply."
 }
 

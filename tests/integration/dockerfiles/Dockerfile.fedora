@@ -4,9 +4,15 @@ RUN dnf install -y \
     sudo curl git ca-certificates file gnupg2 wget \
     && dnf clean all
 
+# PAM en contenedores Docker no puede autenticar con pam_unix.so.
+# Se reemplaza la config de sudo por una permisiva apropiada para test.
+RUN printf '%%PAM-1.0\nauth       sufficient   pam_permit.so\naccount    sufficient   pam_permit.so\nsession    optional     pam_loginuid.so\n' \
+    > /etc/pam.d/sudo
+
 # Usuario no-root con sudo sin contraseña
 RUN useradd -m -s /bin/bash testuser \
-    && echo "testuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+    && echo "testuser ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/testuser \
+    && chmod 0440 /etc/sudoers.d/testuser
 
 COPY --chown=testuser:testuser bootstrap/ /home/testuser/bootstrap/
 

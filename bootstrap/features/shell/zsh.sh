@@ -11,6 +11,7 @@ log_step "Configuring zsh shell..."
 install_zsh_linux() {
   case "$(get_distro)" in
     ubuntu|debian)
+      sudo apt update -qq
       sudo apt install -y zsh
       ;;
     fedora)
@@ -77,7 +78,7 @@ install_community_plugins
 
 if [ "${SHELL}" != "${ZSH_PATH}" ]; then
   log_info "Setting zsh as default shell..."
-  chsh -s "${ZSH_PATH}"
+  chsh -s "${ZSH_PATH}" || log_warn "Could not change default shell automatically. Run manually: chsh -s ${ZSH_PATH}"
 fi
 
 log_info "zsh and oh-my-zsh successfully configured."
