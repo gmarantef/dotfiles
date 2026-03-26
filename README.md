@@ -188,8 +188,8 @@ O directamente:
 | Distro | Estado |
 |--------|--------|
 | Ubuntu | ✅ Validado (brew, bundle, shell, cloud, ai, security, containers, gui) |
-| Fedora | ⬜ Pendiente |
-| Arch   | ⬜ Pendiente |
+| Fedora | ✅ Validado (brew, bundle, shell, cloud, ai, security, containers) |
+| Arch   | ✅ Validado (brew, bundle, shell, cloud, ai, security, containers) |
 | macOS  | ⬜ Pendiente (fuera del scope Docker) |
 
 ---
@@ -220,7 +220,7 @@ O directamente:
 
 ## Roadmap
 
-- [ ] Validar suite completa de tests en Ubuntu, Fedora y Arch
+- [x] Validar suite completa de tests en Ubuntu, Fedora y Arch
 - [ ] Implementar `vm` para Fedora, Arch y macOS
 - [ ] Arquitectura multi-profile completa para secretos (`work` / `personal`)
 - [ ] Evaluar soporte Windows (WSL2)
