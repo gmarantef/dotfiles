@@ -17,7 +17,7 @@ install_basic_plus_flatpak_linux() {
         || log_warn "Could not add flathub remote. Run manually after setup if needed."
       ;;
     fedora)
-      sudo dnf group install development-tools
+      sudo dnf group install -y development-tools
       sudo dnf install -y procps-ng curl file
       ;;
     arch)

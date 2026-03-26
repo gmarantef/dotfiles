@@ -58,8 +58,8 @@ install_docker_fedora() {
 
   sudo dnf -y install dnf-plugins-core
 
-  sudo dnf config-manager addrepo --from-repofile \
-   https://download.docker.com/linux/fedora/docker-ce.repo
+  sudo dnf config-manager addrepo \
+    --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
 
   sudo dnf install -y \
     docker-ce \
@@ -92,14 +92,14 @@ net.ipv4.ip_forward = 1
 EOF
 
   sudo sysctl --system || log_warn "sysctl --system failed. Network forwarding may need manual config."
-  sudo systemctl restart docker
+  sudo systemctl restart docker || log_warn "Could not restart docker service. Restart manually if needed."
 }
 
 install_docker_arch() {
   sudo pacman -Syu --noconfirm
   sudo pacman -S --noconfirm docker
-  sudo systemctl start docker
-  sudo systemctl enable docker
+  sudo systemctl start docker  || log_warn "Could not start docker service. Start manually if needed."
+  sudo systemctl enable docker || log_warn "Could not enable docker service. Enable manually if needed."
   sudo pacman -S --noconfirm docker-compose docker-buildx
   configure_docker_arch
 }
