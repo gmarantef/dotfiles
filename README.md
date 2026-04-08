@@ -79,13 +79,27 @@ chezmoi/
 
 ### 1. Instalar chezmoi
 
+Instala el binario en `/usr/local/bin` para que quede disponible inmediatamente en PATH en cualquier terminal, tanto en Linux como en macOS:
+
 ```bash
-sh -c "$(curl -fsLS get.chezmoi.io)"
+sudo sh -c "$(curl -fsLS get.chezmoi.io)" -- -b /usr/local/bin
 ```
 
-### 2. Crear tu fork y personalizar
+### 2. Inicializar el repositorio
 
-Clona este repositorio, adapta `.chezmoidata.yaml` a tus necesidades:
+```bash
+chezmoi init <tu_usuario_github>
+```
+
+Esto clona el repositorio en `~/.local/share/chezmoi/` sin aplicar nada aún.
+
+### 3. Personalizar antes de aplicar
+
+Edita `.chezmoidata.yaml` para adaptarlo a tus necesidades antes del primer apply:
+
+```bash
+chezmoi edit ~/.local/share/chezmoi/.chezmoidata.yaml
+```
 
 ```yaml
 email: tu@email.com
@@ -104,14 +118,13 @@ secrets:
     work: nombre-del-item-en-bitwarden
 ```
 
-### 3. Inicializar en un sistema limpio
+### 4. Aplicar
 
 ```bash
-chezmoi init https://github.com/<tu_usuario>/dotfiles.git
 chezmoi apply
 ```
 
-### 4. Apply sin ejecutar scripts de bootstrap
+### Apply sin ejecutar scripts de bootstrap
 
 ```bash
 chezmoi apply --exclude=scripts
