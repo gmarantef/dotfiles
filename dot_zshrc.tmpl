@@ -81,12 +81,12 @@ plugins=(
     command-not-found
     {{- end }}
 
-    {{- if (has .features "containers") }}
+    {{- if (has "containers" .features) }}
     docker
     docker-compose
     {{- end }}
 
-    {{- if (has .features "gui") }}
+    {{- if (has "gui" .features) }}
     vscode
     {{- end }}
 
@@ -128,7 +128,7 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-{{- if (has .features "brew") }}
+{{- if (has "brew" .features) }}
 # Config brew for zsh terminal only when brew feature
 if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
   eval "$('/home/linuxbrew/.linuxbrew/bin/brew' shellenv)"
@@ -141,6 +141,6 @@ unset BREW_PREFIX
 {{- end }}
 {{- end }}
 
-{{- if (has .features "ai") }}
+{{- if (has "ai" .features) }}
 export PATH="$HOME/.local/bin:$PATH"
 {{- end }}
