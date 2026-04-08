@@ -9,6 +9,7 @@ flatpak "md.obsidian.Obsidian"
 # Otherwise install Obsidian via cask
 cask "obsidian"
 {{- end }}
+{{- end }}
 
 {{- if (and (eq .context "personal") (has "gui" .features)) }}
 {{- if eq .chezmoi.os "linux"}}
@@ -17,4 +18,5 @@ flatpak "com.valvesoftware.Steam"
 {{- else }}
 # Otherwise install Steam only when personal context via cask
 cask "steam"
+{{- end }}
 {{- end }}

@@ -1,4 +1,5 @@
 README.md
+tests/
 
 # Only manage VSCode settings on GUI feature
 {{- if not (has "gui" .features) }}
