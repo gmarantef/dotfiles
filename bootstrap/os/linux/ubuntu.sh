@@ -14,7 +14,6 @@ sudo apt install -y \
   build-essential \
   file \
   gnupg \
-  glibc \
   groff \
   less
 
