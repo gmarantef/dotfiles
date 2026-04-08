@@ -20,6 +20,14 @@ ai_agents:
 cloud_providers:
   - aws
 
+vscode_extensions:
+  - ms-azuretools.vscode-docker
+  - ms-azuretools.vscode-containers
+  - eamodio.gitlens
+  - redhat.vscode-yaml
+  - timonwong.shellcheck
+  - mutantdino.resourcemonitor
+
 secrets:
   aws:
     personal: aws-credentials-personal

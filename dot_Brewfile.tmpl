@@ -3,12 +3,10 @@ brew "gcc"
 
 {{- if (has .features "gui") }}
 {{- if eq .chezmoi.os "linux" }}
-# Install VSCode and Obsidian via Flatpak for linux
-flatpak "com.visualstudio.code"
+# Install Obsidian via Flatpak for linux
 flatpak "md.obsidian.Obsidian"
 {{- else }}
-# Otherwise install VSCode and Obsidian via cask
-cask "visual-studio-code"
+# Otherwise install Obsidian via cask
 cask "obsidian"
 {{- end }}
 

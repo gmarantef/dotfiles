@@ -15,18 +15,6 @@ FEATURE_FILTER="${2:-all}"
 ALL_DISTROS="ubuntu fedora arch"
 ALL_FEATURES="brew bundle shell cloud ai security containers gui"
 
-# ── Matriz de exclusiones ─────────────────────────────────────────────────────
-# gui sólo implementada para ubuntu/debian en el bootstrap
-should_skip() {
-  local distro="$1"
-  local feature="$2"
-  case "${distro}:${feature}" in
-    fedora:gui) return 0 ;;
-    arch:gui)   return 0 ;;
-    *)          return 1 ;;
-  esac
-}
-
 # ── Helpers de output ─────────────────────────────────────────────────────────
 
 PASS_COUNT=0
@@ -60,11 +48,6 @@ run_test() {
 
   if [ ! -f "${test_script}" ]; then
     result_skip "${distro}" "${feature} (sin script de test)"
-    return
-  fi
-
-  if should_skip "${distro}" "${feature}"; then
-    result_skip "${distro}" "${feature}"
     return
   fi
 

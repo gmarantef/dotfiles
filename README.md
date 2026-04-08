@@ -28,7 +28,7 @@ El proyecto se organiza en **tres dimensiones ortogonales**:
 | `cloud` | CLI de proveedores cloud (AWS CLI v2) |
 | `containers` | Docker Engine / Colima + lazydocker |
 | `security` | Bitwarden CLI + GUI + jq |
-| `gui` | Google Chrome |
+| `gui` | VSCode + extensiones declarativas + Google Chrome |
 | `ai` | Agentes de IA (Claude Code) |
 | `vm` | KVM + QEMU + libvirt + Vagrant _(solo Ubuntu)_ |
 
@@ -94,6 +94,10 @@ context: personal          # "personal" | "work"
 default_shell: zsh
 ai_agents: [claude_code]
 cloud_providers: [aws]
+vscode_extensions:
+  - ms-azuretools.vscode-docker
+  - eamodio.gitlens
+  - redhat.vscode-yaml
 secrets:
   aws:
     personal: nombre-del-item-en-bitwarden
@@ -188,8 +192,8 @@ O directamente:
 | Distro | Estado |
 |--------|--------|
 | Ubuntu | ✅ Validado (brew, bundle, shell, cloud, ai, security, containers, gui) |
-| Fedora | ✅ Validado (brew, bundle, shell, cloud, ai, security, containers) |
-| Arch   | ✅ Validado (brew, bundle, shell, cloud, ai, security, containers) |
+| Fedora | ✅ Validado (brew, bundle, shell, cloud, ai, security, containers, gui) |
+| Arch   | ✅ Validado (brew, bundle, shell, cloud, ai, security, containers, gui) |
 | macOS  | ⬜ Pendiente (fuera del scope Docker) |
 
 ---
@@ -214,13 +218,14 @@ O directamente:
 1. `bootstrap/os/linux/<distro>.sh`
 2. Añadir `case` en `bootstrap/os/linux.sh`
 3. `tests/integration/dockerfiles/Dockerfile.<distro>`
-4. Actualizar arrays `ALL_DISTROS` y `should_skip()` en `run_tests.sh`
+4. Actualizar array `ALL_DISTROS` en `run_tests.sh`
 
 ---
 
 ## Roadmap
 
 - [x] Validar suite completa de tests en Ubuntu, Fedora y Arch
+- [x] Gestión de extensiones VSCode declarativas via `vscode_extensions` en `.chezmoidata.yaml`
 - [ ] Implementar `vm` para Fedora, Arch y macOS
 - [ ] Arquitectura multi-profile completa para secretos (`work` / `personal`)
 - [ ] Evaluar soporte Windows (WSL2)
