@@ -130,6 +130,15 @@ chezmoi apply
 chezmoi apply --exclude=scripts
 ```
 
+### Añadir features después del bootstrap inicial
+
+El script de bootstrap usa `run_onchange_`, por lo que chezmoi lo re-ejecuta automáticamente cuando cambia el contenido de `.chezmoidata.yaml`. Las features ya instaladas se saltan por ser idempotentes; solo se instala lo nuevo.
+
+```bash
+chezmoi edit ~/.local/share/chezmoi/.chezmoidata.yaml  # añade la nueva feature
+chezmoi apply                                           # re-ejecuta bootstrap
+```
+
 ---
 
 ## Uso diario
