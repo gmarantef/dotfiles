@@ -19,7 +19,7 @@ export CLOUD_PROVIDERS
 export AI_AGENTS
 export VSCODE_EXTENSIONS
 
-BOOTSTRAP_DIR="$(cd "$(dirname "$0")/bootstrap" && pwd)"
+BOOTSTRAP_DIR="{{ .chezmoi.sourceDir }}/bootstrap"
 export BOOTSTRAP_DIR
 
 # shellcheck source=bootstrap/lib.sh
