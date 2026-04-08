@@ -9,6 +9,18 @@ _BOOTSTRAP_LIB_SOURCED=1
 
 set -euo pipefail
 
+# ── Homebrew PATH ────────────────────────────────────────────────────────────
+# Configura el entorno de Homebrew si está instalado, para que brew esté
+# disponible en todos los feature scripts independientemente del orden de ejecución.
+
+if [ -x "/home/linuxbrew/.linuxbrew/bin/brew" ]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+elif [ -x "/opt/homebrew/bin/brew" ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x "/usr/local/bin/brew" ]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+
 # ── Logging ───────────────────────────────────────────────────────────────────
 
 log_info()  { echo "[INFO]  $*"; }
