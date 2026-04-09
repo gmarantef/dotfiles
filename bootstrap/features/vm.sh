@@ -63,10 +63,10 @@ install_virtualization_tools_linux() {
 }
 
 case "${OS}" in
-  Linux)
+  linux)
     install_virtualization_tools_linux
     ;;
-  Darwin)
+  darwin)
     log_warn "macOS virtualization support not implemented yet."
     exit 0
     ;;
