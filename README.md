@@ -251,6 +251,7 @@ O directamente:
 - [ ] Implementar `vm` para Fedora, Arch y macOS
 - [ ] Arquitectura multi-profile completa para secretos (`work` / `personal`)
 - [ ] Evaluar soporte Windows (WSL2)
+- [ ] Consolidar la instalación de Steam en `bootstrap/features/gui.sh` — actualmente está repartida entre `dot_Brewfile.tmpl` (Flatpak) y `gui.sh` (`steam-devices`); moverla completamente a `gui.sh` centralizaría la lógica
 
 ---
 
