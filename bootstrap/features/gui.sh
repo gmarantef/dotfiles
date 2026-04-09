@@ -98,10 +98,10 @@ else
   log_info "VSCode already installed."
 fi
 
-if command -v code >/dev/null 2>&1 && [ -n "${VSCODE_EXTENSIONS:-}" ]; then
+if command -v code >/dev/null 2>&1 && [ -n "${DOTFILES_VSCODE_EXTENSIONS:-}" ]; then
   log_info "Installing VSCode extensions..."
   installed_exts="$(code --list-extensions 2>/dev/null | tr '[:upper:]' '[:lower:]' || true)"
-  for ext in ${VSCODE_EXTENSIONS}; do
+  for ext in ${DOTFILES_VSCODE_EXTENSIONS}; do
     if echo "${installed_exts}" | grep -qx "$(echo "${ext}" | tr '[:upper:]' '[:lower:]')"; then
       log_info "  Already installed: ${ext}"
     else
@@ -134,6 +134,15 @@ if ! command -v google-chrome >/dev/null 2>&1 && ! command -v google-chrome-stab
   log_info "Google Chrome successfully configured."
 else
   log_info "Google Chrome already installed."
+fi
+
+if [ "${OS}" = "linux" ] && [ "${CONTEXT}" = "personal" ]; then
+  case "$(get_distro)" in
+    ubuntu|debian)
+      log_info "Installing steam-devices udev rules..."
+      sudo apt install -y steam-devices
+      ;;
+  esac
 fi
 
 log_info "GUI feature completed successfully."

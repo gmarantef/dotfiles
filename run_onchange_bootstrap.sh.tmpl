@@ -8,7 +8,7 @@ CONTEXT="{{ .context }}"
 DEFAULT_SHELL="{{ .default_shell }}"
 CLOUD_PROVIDERS="{{ join " " .cloud_providers }}"
 AI_AGENTS="{{ join " " .ai_agents }}"
-VSCODE_EXTENSIONS="{{ join " " .vscode_extensions }}"
+DOTFILES_VSCODE_EXTENSIONS="{{ join " " .vscode_extensions }}"
 
 export OS
 export ARCHITECTURE
@@ -17,7 +17,7 @@ export CONTEXT
 export DEFAULT_SHELL
 export CLOUD_PROVIDERS
 export AI_AGENTS
-export VSCODE_EXTENSIONS
+export DOTFILES_VSCODE_EXTENSIONS
 
 BOOTSTRAP_DIR="{{ .chezmoi.sourceDir }}/bootstrap"
 export BOOTSTRAP_DIR
