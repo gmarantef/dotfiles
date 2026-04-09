@@ -218,6 +218,8 @@ O directamente:
 | Arch   | ✅ Validado (brew, bundle, shell, cloud, ai, security, containers, gui) |
 | macOS  | ⬜ Pendiente (fuera del scope Docker) |
 
+> El bootstrap ha sido validado también en un entorno de producción real (fuera de los tests) sobre **Ubuntu 24.04.4 LTS** satisfactoriamente.
+
 ---
 
 ## Extensión del proyecto
