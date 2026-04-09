@@ -20,5 +20,6 @@
     "editor.suggestSelection": "first",
     "editor.tabCompletion": "on",
     "editor.tabSize": 2,
-    "files.trimTrailingWhitespace": true
+    "files.trimTrailingWhitespace": true,
+    "claudeCode.preferredLocation": "panel"
 }

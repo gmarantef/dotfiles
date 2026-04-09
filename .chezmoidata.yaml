@@ -27,6 +27,7 @@ vscode_extensions:
   - redhat.vscode-yaml
   - timonwong.shellcheck
   - mutantdino.resourcemonitor
+  - anthropic.claude-code
 
 secrets:
   aws:
