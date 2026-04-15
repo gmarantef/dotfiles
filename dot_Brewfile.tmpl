@@ -1,16 +1,6 @@
 # GNU compiler collection
 brew "gcc"
 
-{{- if (has "gui" .features) }}
-{{- if eq .chezmoi.os "linux" }}
-# Install Obsidian via Flatpak for linux
-flatpak "md.obsidian.Obsidian"
-{{- else }}
-# Otherwise install Obsidian via cask
-cask "obsidian"
-{{- end }}
-{{- end }}
-
 {{- if (and (eq .context "personal") (has "gui" .features)) }}
 {{- if eq .chezmoi.os "linux"}}
 # Install Steam only when personal context via Flatpak for Linux

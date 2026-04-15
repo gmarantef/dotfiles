@@ -12,6 +12,17 @@ bash "${BOOTSTRAP_DIR}/features/gui.sh"
 # --- Assert VSCode (todas las distros) ---
 assert_command code
 
+# --- Assert Obsidian (todas las distros con soporte) ---
+distro=$(. /etc/os-release && echo "${ID}")
+case "${distro}" in
+  ubuntu|debian|fedora|arch)
+    assert_command obsidian
+    ;;
+  *)
+    log_pass "Obsidian: distro '${distro}' sin soporte — skip esperado"
+    ;;
+esac
+
 # --- Assert Chrome (ubuntu y fedora tienen repo oficial; arch no) ---
 distro=$(. /etc/os-release && echo "${ID}")
 case "${distro}" in

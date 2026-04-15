@@ -136,6 +136,58 @@ else
   log_info "Google Chrome already installed."
 fi
 
+_obsidian_latest_version() {
+  # Obtiene la versión siguiendo el redirect de /releases/latest, evitando la API (rate limits)
+  curl -fsSL -o /dev/null -w '%{url_effective}' \
+    https://github.com/obsidianmd/obsidian-releases/releases/latest \
+    | sed 's|.*/tag/v||'
+}
+
+install_obsidian_ubuntu() {
+  local version tmp
+  version=$(_obsidian_latest_version)
+  tmp=$(mktemp --suffix=.deb)
+  curl -fsSL "https://github.com/obsidianmd/obsidian-releases/releases/latest/download/obsidian_${version}_amd64.deb" \
+    -o "${tmp}"
+  sudo apt install -y "${tmp}"
+  rm -f "${tmp}"
+}
+
+install_obsidian_appimage() {
+  # Obsidian no publica .rpm oficial; AppImage funciona en cualquier distro Linux
+  local version dest
+  version=$(_obsidian_latest_version)
+  dest=/usr/local/bin/obsidian
+  curl -fsSL \
+    "https://github.com/obsidianmd/obsidian-releases/releases/latest/download/Obsidian-${version}.AppImage" \
+    | sudo tee "${dest}" > /dev/null
+  sudo chmod +x "${dest}"
+}
+
+if ! command -v obsidian >/dev/null 2>&1; then
+  log_info "Installing Obsidian..."
+  case "${OS}" in
+    linux)
+      case "$(get_distro)" in
+        ubuntu|debian) install_obsidian_ubuntu ;;
+        fedora)        install_obsidian_appimage ;;
+        arch)          sudo pacman -S --noconfirm obsidian ;;
+        *)             log_warn "Obsidian installation not supported for distro: $(get_distro)" ;;
+      esac
+      ;;
+    darwin)
+      require_command brew "Run the 'brew' feature first."
+      brew install --cask obsidian
+      ;;
+    *)
+      log_warn "OS not supported for Obsidian: ${OS}"
+      ;;
+  esac
+  log_info "Obsidian successfully installed."
+else
+  log_info "Obsidian already installed."
+fi
+
 if [ "${OS}" = "linux" ] && [ "${CONTEXT}" = "personal" ]; then
   case "$(get_distro)" in
     ubuntu|debian)
